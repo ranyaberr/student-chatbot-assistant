@@ -1,0 +1,57 @@
+[
+  {
+    "id": "3cfcf2d0-8d84-46fd-b762-a070fbae8304",
+    "text": "Studying data science and AI",
+    "conversation_id": "4cca9b2a-d568-42ac-8969-66bf215a8b5e"
+  },
+  {
+    "id": "6bc0220f-5c0c-416b-b12a-90b354b279f7",
+    "text": "Currently learning Java and C++",
+    "conversation_id": "4cca9b2a-d568-42ac-8969-66bf215a8b5e"
+  },
+  {
+    "id": "453c8cd1-c7e5-4025-aeba-58af6826dd81",
+    "text": "Interested in big data",
+    "conversation_id": "4cca9b2a-d568-42ac-8969-66bf215a8b5e"
+  },
+  {
+    "id": "40b316af-3592-473b-b534-6d5ccc5140e9",
+    "text": "Wants to learn machine learning",
+    "conversation_id": "bf915019-ea1e-41dc-a7d2-3214e9b6c140"
+  },
+  {
+    "id": "acec1012-b900-4fc8-a577-35b483f075ff",
+    "text": "Likely to use Python for machine learning",
+    "conversation_id": "bf915019-ea1e-41dc-a7d2-3214e9b6c140"
+  },
+  {
+    "id": "fc4b2fc5-d068-4a24-8eac-78b6ef96e984",
+    "text": "Seeking specific questions and explanations on machine learning topics",
+    "conversation_id": "bf915019-ea1e-41dc-a7d2-3214e9b6c140"
+  },
+  {
+    "id": "ddac901f-2e28-4414-aea9-d30a6aaca915",
+    "text": "Studying object-oriented programming",
+    "conversation_id": "a6da4b61-f666-42a4-bf89-818022ce3227"
+  },
+  {
+    "id": "15d656b9-9158-4fa8-b192-d36669c66612",
+    "text": "Currently learning about polymorphism",
+    "conversation_id": "a6da4b61-f666-42a4-bf89-818022ce3227"
+  },
+  {
+    "id": "59e3f71a-8ccb-4833-8ecc-24d489b8e80d",
+    "text": "Planning to explore machine learning concepts in Python",
+    "conversation_id": "5606954b-5a38-4a13-a327-94023d0ed731"
+  },
+  {
+    "id": "281044dd-7ac2-41f8-ad73-0fea2ab5a85f",
+    "text": "Currently learning about arrays in Java",
+    "conversation_id": "5606954b-5a38-4a13-a327-94023d0ed731"
+  },
+  {
+    "id": "582f30b8-87f6-4a8a-ab27-c021a973ff6d",
+    "text": "Currently studying courses: TP, JAVA, Technologies WEB, SI et BD, Compilation, Recherche opérationnelle: Modélisation stochastique, Dev WEB - SDBDIA S6, Architectures des ordinateurs, Comptabilité Générale (Cours et TD), Recherche Opérationnelle",
+    "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
+  }
+]
