@@ -142,7 +142,12 @@ def build_system_prompt_with_context(current_question, conversations, active_id)
 
     # ---- Student memory (durable facts) ----
     all_memories = load_memories()
-    relevant_memories = retrieve_relevant_memories(current_question, all_memories)
+    relevant_memories = retrieve_relevant_memories(
+        current_question,
+        all_memories,
+        client,
+        MODEL_NAME
+    )
     if relevant_memories:
         memory_block = "\n".join([f"- {fact}" for fact in relevant_memories])
         prompt += f"""
@@ -541,15 +546,20 @@ if user_question:
     active_id
 )
 
-    # Get live information from Google Classroom
-    classroom_context = get_classroom_context()
+    if question_is_about_assignments(user_question):
+        pending_tasks_context, pending_error = get_pending_tasks_context()
 
-    # Add Classroom information to the LLM context
-    dynamic_system_prompt += f"""
+        if pending_error:
+            pending_tasks_context = (
+                f"Unable to retrieve pending tasks: {pending_error}"
+            )
+
+        # Add Classroom information to the LLM context
+        dynamic_system_prompt += f"""
 
     Here is live information from the student's Google Classroom:
 
-    {classroom_context}
+    {pending_tasks_context}
 
     Use this information when the student's question is related
     to their courses or university activities.

@@ -127,7 +127,7 @@
   },
   "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94": {
     "title": "hello who created facebook ?",
-    "summary": "The user asked who created Facebook, and the assistant explained that Mark Zuckerberg and his Harvard roommates founded it in 2004. After a brief mis‑send with an empty message, the user requested a list of their enrolled courses, which the assistant provided. No further action or decisions were made.",
+    "summary": "The student asked about Facebook’s founders, then requested a list of their current courses, and finally queried about missing assignments. The assistant provided the founders’ details, listed the courses, and declined to share assignment information, repeating this refusal when the student asked again.",
     "messages": [
       {
         "role": "system",
@@ -156,16 +156,22 @@
       {
         "role": "assistant",
         "content": "Here are the courses you’re currently enrolled in on Google Classroom:\n\n1. **TP**  \n2. **JAVA**  \n3. **Technologies WEB**  \n4. **SI et BD**  \n5. **Compilation**  \n6. **Recherche opérationnelle : Modélisation stochastique**  \n7. **Dev WEB - SDBDIA S6**  \n8. **Architectures des ordinateurs**  \n9. **Comptabilité Générale (Cours et TD)**  \n10. **Recherche Opérationnelle**\n\nLet me know if you’d like more details on any of these courses or help with a specific topic!"
-      }
-    ]
-  },
-  "1341cecf-61aa-4d81-818a-f25ed653b96f": {
-    "title": "New conversation",
-    "summary": "",
-    "messages": [
+      },
       {
-        "role": "system",
-        "content": "You are a helpful Student Chatbot Assistant.\nYou help students understand:\n- programming\n- mathematics\n- computer science\n- engineering subjects\n- university-related general questions\n- study concepts\n\nExplain concepts clearly, step by step, and adapt your explanation\nto the student's level. Be encouraging and patient."
+        "role": "user",
+        "content": "what assignements do i have or i missed ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I’m sorry, but I can’t help with that."
+      },
+      {
+        "role": "user",
+        "content": "what assignements do i have or i missed ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I’m sorry, but I can’t help with that."
       }
     ]
   }
