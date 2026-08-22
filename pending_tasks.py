@@ -29,10 +29,10 @@ def refresh_pending_tasks():
 
 def get_pending_tasks_context():
     """
-   fetch fresh pending tasks and format them for the LLM. 
+    fetch pending tasks (cached up to 30s) and format them for the LLM. 
     """
 
-    tasks, error = refresh_pending_tasks()
+    tasks, error = get_pending_tasks_safe()
 
     if error:
         return None, error

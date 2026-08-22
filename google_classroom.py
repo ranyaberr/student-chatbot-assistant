@@ -87,50 +87,67 @@ def get_coursework():
     all_coursework = []
 
     for course in courses:
-        course_id = course.get("id")
-        course_name = course.get("name", "Unnamed course")
+            course_id = course.get("id")
+            course_name = course.get("name", "Unnamed course")
 
-        coursework_results = service.courses().courseWork().list(
-            courseId=course_id
-        ).execute()
+            coursework_results = service.courses().courseWork().list(
+                courseId=course_id
+            ).execute(num_retries=3)
 
-        coursework_items = coursework_results.get("courseWork", [])
+            coursework_items = coursework_results.get("courseWork", [])
 
-        for item in coursework_items:
-            coursework_id = item.get("id")
+            # Batch-fetch ALL submissions for this course in one call
+            # (courseWorkId="-" means "all coursework in this course"),
+            # following pagination if present.
+            submissions_by_courseworkid = {}
 
-            entry = {
-                "course_id": course_id,
-                "course_name": course_name,
-                "coursework_id": coursework_id,
-                "title": item.get("title", "Untitled assignment"),
-            }
+            page_token = None
+            while True:
+                submissions_results = service.courses().courseWork().studentSubmissions().list(
+                    courseId=course_id,
+                    courseWorkId="-",
+                    userId="me",
+                    pageToken=page_token
+                ).execute(num_retries=3)
 
-            if "description" in item:
-                entry["description"] = item["description"]
+                for submission in submissions_results.get("studentSubmissions", []):
+                    cw_id = submission.get("courseWorkId")
+                    if cw_id not in submissions_by_courseworkid:
+                        submissions_by_courseworkid[cw_id] = submission
 
-            if "dueDate" in item:
-                entry["due_date"] = item["dueDate"]
+                page_token = submissions_results.get("nextPageToken")
+                if not page_token:
+                    break
 
-            if "dueTime" in item:
-                entry["due_time"] = item["dueTime"]
+            for item in coursework_items:
+                coursework_id = item.get("id")
 
-            if "alternateLink" in item:
-                entry["classroom_url"] = item["alternateLink"]
+                entry = {
+                    "course_id": course_id,
+                    "course_name": course_name,
+                    "coursework_id": coursework_id,
+                    "title": item.get("title", "Untitled assignment"),
+                }
 
-            # Retrieve the student's own submission for this coursework
-            submissions_results = service.courses().courseWork().studentSubmissions().list(
-                courseId=course_id,
-                courseWorkId=coursework_id,
-                userId="me"
-            ).execute()
+                if "description" in item:
+                    entry["description"] = item["description"]
 
-            submissions = submissions_results.get("studentSubmissions", [])
+                if "dueDate" in item:
+                    entry["due_date"] = item["dueDate"]
 
-            if submissions:
-                entry["submission_state"] = submissions[0].get("state")
+                if "dueTime" in item:
+                    entry["due_time"] = item["dueTime"]
 
-            all_coursework.append(entry)
+                if "alternateLink" in item:
+                    entry["classroom_url"] = item["alternateLink"]
+
+                # Look up this coursework's submission from the batch result
+                submission = submissions_by_courseworkid.get(coursework_id)
+
+                if submission:
+                    entry["submission_state"] = submission.get("state")
+
+                all_coursework.append(entry)
 
     return all_coursework
 

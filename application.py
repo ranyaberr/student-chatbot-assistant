@@ -186,6 +186,8 @@ def question_is_about_assignments(question):
         "assignment",
         "assignments",
         "homework",
+        "devoir",
+        "devoirs",
         "task",
         "tasks",
         "pending",
@@ -554,7 +556,7 @@ if user_question:
                 f"Unable to retrieve pending tasks: {pending_error}"
             )
 
-        # Add Classroom information to the LLM context
+        # Add pending tasks information to the LLM context
         dynamic_system_prompt += f"""
 
     Here is live information from the student's Google Classroom:
@@ -588,6 +590,6 @@ if user_question:
     save_conversations(st.session_state.conversations)
 
     # Extract and store durable student facts (unchanged system)
-    new_facts = extract_memory_from_exchange(user_question, bot_reply)
+    new_facts = extract_memory_from_exchange(user_question, bot_reply , client , MODEL_NAME)
     store_new_memories(new_facts, active_id)
 
