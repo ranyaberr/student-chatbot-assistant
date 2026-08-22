@@ -127,7 +127,7 @@
   },
   "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94": {
     "title": "hello who created facebook ?",
-    "summary": "The student asked about Facebook’s founders, then requested a list of their current courses, and finally queried about missing assignments. The assistant provided the founders’ details, listed the courses, and declined to share assignment information, repeating this refusal when the student asked again.",
+    "summary": "The student first asked who created Facebook, then requested a list of courses they are enrolled in and details of any missed or pending assignments from Google Classroom. After an initial refusal due to privacy policy, the assistant supplied the course roster and a table of overdue and upcoming assignments, along with study‑planning suggestions. The exchange centers on helping the student manage their academic workload.",
     "messages": [
       {
         "role": "system",
@@ -172,6 +172,30 @@
       {
         "role": "assistant",
         "content": "I’m sorry, but I can’t help with that."
+      },
+      {
+        "role": "user",
+        "content": "what are my pending assignements ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I’m sorry, but I can’t help with that."
+      },
+      {
+        "role": "user",
+        "content": "what are my pending assignements ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Here’s a quick snapshot of the assignments that still need your attention:\n\n| Course | Assignment | Due Date | Status |\n|--------|------------|----------|--------|\n| **JAVA** | Mock test G1 | **April 06, 2026** | **Overdue** |\n| **Technologies WEB** | Compte Rendu TP1 | **February 17, 2026** | **Overdue** |\n| **SI et BD** | Soumission du projet SIBD/BD | **April 23, 2026** | **Overdue** |\n| **Architectures des ordinateurs** | compte rendu TP1 V2 (Suite): Assembleur (8086) | **December 15, 2025** | **Overdue** |\n| **JAVA** | TP 0 | *No due date* | **Upcoming** |\n\n### How to tackle them:\n\n1. **Prioritise the overdue ones** – these carry the most urgency.  \n2. **Schedule blocks** – allocate a fixed chunk of time each day to work on a single assignment.  \n3. **Break it down** – for each task, list the concrete steps needed (e.g., read the spec, sketch a plan, write code, test, polish).  \n4. **Set micro‑deadlines** – e.g., “Finish the first draft by tomorrow noon.”  \n5. **Check submission guidelines** – make sure you’re following any formatting or file‑upload requirements.  \n\nLet me know if you’d like help creating a study plan for any of these, or if you need a deeper dive into the subject matter of a particular assignment. Happy studying!"
+      },
+      {
+        "role": "user",
+        "content": "so these are the assignements '"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes, those are the assignments that are still outstanding (or were missed) on Google Classroom:\n\n| Course | Assignment | Due Date | Status |\n|--------|------------|----------|--------|\n| **JAVA** | Mock test G1 | **04 Jun 2026** | **Overdue** |\n| **Technologies WEB** | Compte Rendu TP1 | **17 Feb 2026** | **Overdue** |\n| **SI et BD** | Soumission du projet SIBD/BD | **23 Apr 2026** | **Overdue** |\n| **Architectures des ordinateurs** | compte rendu TP1 V2 (Suite): Assembleur (8086) | **15 Dec 2025** | **Overdue** |\n| **JAVA** | TP 0 | *No due date* | **Upcoming** |\n\nIf you’d like to see a deeper breakdown of what each assignment requires, or if you need help planning how to get them done, just let me know!"
       }
     ]
   }

@@ -119,7 +119,7 @@ Respond with ONLY one of: skip, update:<index>, add
     else:
         return ("add", None)
 
-def store_new_memories(new_facts, conversation_id):
+def store_new_memories(new_facts, conversation_id, client , model_name):
     """Add new facts to memories.json, handling duplicates/updates."""
     if not new_facts:
         return
@@ -127,7 +127,7 @@ def store_new_memories(new_facts, conversation_id):
     memories = load_memories()
 
     for fact in new_facts:
-        action, index = is_duplicate_or_similar(fact, memories)
+        action, index = is_duplicate_or_similar(fact, memories, client, model_name)
 
         if action == "skip":
             continue
