@@ -6,8 +6,8 @@
   },
   {
     "id": "6bc0220f-5c0c-416b-b12a-90b354b279f7",
-    "text": "Currently learning Java and C++",
-    "conversation_id": "4cca9b2a-d568-42ac-8969-66bf215a8b5e"
+    "text": "Familiar with C++ and Java OOP concepts such as polymorphism and arrays",
+    "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
   },
   {
     "id": "453c8cd1-c7e5-4025-aeba-58af6826dd81",
@@ -53,5 +53,35 @@
     "id": "582f30b8-87f6-4a8a-ab27-c021a973ff6d",
     "text": "Currently studying courses: TP, JAVA, Technologies WEB, SI et BD, Compilation, Recherche opérationnelle: Modélisation stochastique, Dev WEB - SDBDIA S6, Architectures des ordinateurs, Comptabilité Générale (Cours et TD), Recherche Opérationnelle",
     "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
+  },
+  {
+    "id": "1bff97e2-bf34-430e-a6ea-c20ca3ebde9d",
+    "text": "Uses Google Classroom",
+    "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
+  },
+  {
+    "id": "3472783c-4ef8-4f3b-903f-1cf55db3e047",
+    "text": "Has multiple Google Classroom assignments across Java, Web, SI, and Architecture modules",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "c863a4b7-8e33-4618-b8c8-bb0e42d50120",
+    "text": "Prioritizes overdue assignments first",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "42688151-0bf4-4214-aa36-f673e870db43",
+    "text": "Seeking to study Java in a structured roadmap from fundamentals to advanced topics",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "d6bed9d7-be21-4bbf-afdd-04f97c6c0a79",
+    "text": "Interested in Java concepts such as OOP, collections, generics, streams, concurrency, design patterns, and JVM internals",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "2efaed74-0925-4d3c-9537-b955e8f2ba96",
+    "text": "Looking to set up a study schedule",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
   }
 ]

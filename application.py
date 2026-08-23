@@ -316,6 +316,13 @@ with st.sidebar:
     # ---------------------------------------------------------
 
     if st.button("New Chat", use_container_width=True):
+        current_conversation = st.session_state.conversations[
+            st.session_state.active_conversation_id
+        ]
+        current_conversation["summary"] = generate_conversation_summary(
+            current_conversation
+        )
+
         new_id = create_new_conversation(
             st.session_state.conversations
         )
@@ -382,6 +389,15 @@ with st.sidebar:
                     title,
                     key=f"conv_{conversation_id}"
                 ):
+                    if conversation_id != st.session_state.active_conversation_id:
+                        current_conversation = st.session_state.conversations[
+                            st.session_state.active_conversation_id
+                        ]
+                        current_conversation["summary"] = generate_conversation_summary(
+                            current_conversation
+                        )
+                        save_conversations(st.session_state.conversations)
+
                     st.session_state.active_conversation_id = (
                         conversation_id
                     )
@@ -584,12 +600,8 @@ if user_question:
 
     active_conversation["messages"].append({"role": "assistant", "content": bot_reply})
 
-    # Update this conversation's summary to reflect the latest state
-    active_conversation["summary"] = generate_conversation_summary(active_conversation)
-
     save_conversations(st.session_state.conversations)
 
     # Extract and store durable student facts (unchanged system)
     new_facts = extract_memory_from_exchange(user_question, bot_reply , client , MODEL_NAME)
-    store_new_memories(new_facts, active_id)
-
+    store_new_memories(new_facts, active_id , client, MODEL_NAME)
