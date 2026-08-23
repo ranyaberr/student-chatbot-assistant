@@ -83,5 +83,30 @@
     "id": "2efaed74-0925-4d3c-9537-b955e8f2ba96",
     "text": "Looking to set up a study schedule",
     "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "4a713cbd-67e3-418d-a045-089fed3aeebe",
+    "text": "Learning Python (and Java) for coding projects",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "6524e738-1459-45a2-9fef-d955f748d07d",
+    "text": "Uses flashcards (Anki) and spaced repetition to memorize formulas",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "0f79d676-55cb-4ffd-be07-ff57c7c10779",
+    "text": "Prefers micro‑study sessions (Pomodoro) and concept maps for learning",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "b7dee2d5-651f-4dcf-a4ab-3734380a53fc",
+    "text": "Maintains a math journal to track progress",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+  },
+  {
+    "id": "d90689dd-1684-4bf4-9ce5-7fe83702cad9",
+    "text": "Links mathematical concepts to data‑science projects",
+    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
   }
 ]
