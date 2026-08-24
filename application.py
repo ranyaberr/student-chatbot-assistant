@@ -1,9 +1,11 @@
 from groq import Groq
 from dotenv import load_dotenv
 import os
+import json
 import streamlit as st
 from config import MODEL_NAME, SYSTEM_PROMPT
-from google_classroom import get_google_classroom_service, get_classroom_context
+from google_classroom import get_google_classroom_service
+from router import route_message
 from conversations import (
     load_conversations,
     save_conversations,
@@ -14,7 +16,6 @@ from conversations import (
 
 from memory import (
     load_memories,
-    extract_memory_from_exchange,
     store_new_memories,
     retrieve_relevant_memories
 )
@@ -41,17 +42,45 @@ DATA_FILE = os.path.join(DATA_FOLDER, "conversations.json")
 
 
 # ---------------------------------------------------------
-# CONVERSATION SUMMARY: generate/update per-conversation summaries
+# CONVERSATION CLOSE: combined summary + durable-facts extraction
 # ---------------------------------------------------------
-def generate_conversation_summary(conversation):
+# Runs ONLY when a conversation is closed/switched away from (New
+# Chat button, or picking a different conversation in the sidebar),
+# not after every message. One Groq call analyzes the WHOLE
+# conversation and returns both:
+#   - "summary": what happened in THIS conversation (stored in
+#     conversations.json, used for previous-conversation context)
+#   - "facts": durable info about the student (deduplicated/updated
+#     via deterministic Python matching, stored in memories.json)
+# These are different concepts and are stored separately.
+def close_conversation_and_process_memory(conversation, conversation_id):
     """
-    Create or update a short summary of the conversation using the LLM.
-    Called after each exchange so the summary always reflects the
-    latest state of the conversation.
+    Process a conversation when it is closed/switched away from.
+
+    Guarded against duplicate processing: each conversation tracks
+    how many messages existed the last time it was processed
+    (memory_processed_count). If nothing new was added since then,
+    this is a no-op and makes NO Groq call at all — safe to call on
+    every "New Chat" click, every conversation switch, and safe
+    across Streamlit reruns.
     """
     real_messages = conversation["messages"][1:]  # skip system prompt
+
     if not real_messages:
-        return ""
+        # Never chatted in this conversation — nothing to summarize
+        # or extract facts from. No Groq call.
+        print("[MEMORY] Conversation empty — skipping close processing")
+        return
+
+    processed_count = conversation.get("memory_processed_count", 0)
+    current_count = len(real_messages)
+
+    if current_count <= processed_count:
+        # Already processed and nothing new since — avoid duplicate
+        # processing (e.g. switching back and forth, Streamlit
+        # reruns). No Groq call.
+        print("[MEMORY] Conversation already processed — skipping (no new messages)")
+        return
 
     transcript = "\n".join(
         [f"{m['role']}: {m['content']}" for m in real_messages]
@@ -59,32 +88,82 @@ def generate_conversation_summary(conversation):
 
     previous_summary = conversation.get("summary", "")
 
-    summary_prompt = f"""Summarize the following conversation between a student and an assistant.
+    close_prompt = f"""Analyze this full conversation between a student and an assistant.
 
-The summary must capture:
-- the main topic
-- important things discussed
-- important questions or problems
-- important conclusions or decisions
-- context needed to understand what happened
+Produce TWO things:
 
-Do NOT include greetings, small talk, or a message-by-message account.
-Keep it concise (1-3 sentences).
+1. "summary": a concise summary (1-3 sentences) of what happened in
+   THIS conversation specifically — the main topic, important
+   questions/problems, and important conclusions. Do NOT include
+   greetings, small talk, or a message-by-message account.
 
-Previous summary (if any): "{previous_summary}"
+2. "facts": a list of DURABLE, reusable facts about the STUDENT that
+   would help in future, UNRELATED conversations. Examples of what to
+   extract:
+   - current university modules / studies
+   - current projects
+   - technologies/programming languages being learned
+   - preferred explanation style
+   - learning goals
+   - recurring interests
+   - future objectives
+   - important preferences
 
-Full conversation so far:
+   Do NOT extract:
+   - one-time questions with no future relevance (e.g. "What is a Python loop?")
+   - greetings, jokes, small talk
+   - temporary/throwaway requests
+
+   If nothing is worth remembering, "facts" must be an empty list.
+
+Previous summary of this conversation (if any): "{previous_summary}"
+
+Full conversation:
 {transcript}
 
-Respond ONLY with the updated summary text. No labels, no quotes, no extra formatting.
+Respond ONLY with a JSON object in this exact shape, no extra text,
+no code fences:
+{{"summary": "...", "facts": ["...", "..."]}}
 """
 
-    response = client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[{"role": "user", "content": summary_prompt}]
-    )
+    # Everything below can fail (API error, malformed JSON). If it
+    # does, the conversation must NOT be marked as processed, so a
+    # later close attempt will retry instead of silently losing this
+    # exchange's summary/facts.
+    try:
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[{"role": "user", "content": close_prompt}]
+        )
 
-    return response.choices[0].message.content.strip()
+        raw_reply = response.choices[0].message.content.strip()
+
+        if raw_reply.startswith("```"):
+            raw_reply = raw_reply.strip("`")
+            if raw_reply.startswith("json"):
+                raw_reply = raw_reply[4:]
+            raw_reply = raw_reply.strip()
+
+        data = json.loads(raw_reply)
+        summary = data.get("summary", "").strip() if isinstance(data.get("summary"), str) else previous_summary
+        facts = [
+            f.strip() for f in data.get("facts", [])
+            if isinstance(f, str) and f.strip()
+        ]
+    except Exception as e:
+        print(f"[MEMORY] Conversation close processing failed ({e}) — not marked as processed")
+        return
+
+    conversation["summary"] = summary
+    conversation["memory_processed_count"] = current_count
+
+    print(f"[MEMORY] Conversation closed — summary updated"
+          + (f", {len(facts)} candidate fact(s) found" if facts else ", no durable facts found"))
+
+    # Deterministic Python deduplication/update (no LLM call) only
+    # runs when facts were actually extracted.
+    if facts:
+        store_new_memories(facts, conversation_id)
 
 def get_previous_conversation_summary(conversations, active_id):
     """
@@ -110,57 +189,44 @@ def get_previous_conversation_summary(conversations, active_id):
 
     return None
 
-def question_needs_previous_conversation(current_question):
+def build_system_prompt_with_context(route, current_question, conversations, active_id):
     """
-    Ask the LLM if the question is referring to a previous/past
-    conversation (e.g. "what did we talk about last time?").
-    Returns True/False.
-    """
-    check_prompt = f"""Does this student message refer to a PREVIOUS conversation
-(e.g. asking what was discussed before, asking to continue an earlier topic,
-referring to "last time", "yesterday", "before", "previously")?
-
-Message: "{current_question}"
-
-Respond ONLY with "yes" or "no".
-"""
-    response = client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[{"role": "user", "content": check_prompt}]
-    )
-    answer = response.choices[0].message.content.strip().lower()
-    return answer.startswith("yes")
-
-def build_system_prompt_with_context(current_question, conversations, active_id):
-    """
-    Build the system prompt, injecting:
-    - relevant student memories (memories.json)
-    - the previous conversation's summary, ONLY if the question
-      seems to refer to a past conversation
+    Build the system prompt, injecting only the context the router
+    (pure Python, no LLM) determined is actually needed:
+    - relevant student memories (lightweight keyword match), only if
+      route.needs_memory or route.needs_previous_conversation
+    - the previous conversation's summary, only if
+      route.needs_previous_conversation
     """
     prompt = SYSTEM_PROMPT
 
     # ---- Student memory (durable facts) ----
-    all_memories = load_memories()
-    relevant_memories = retrieve_relevant_memories(
-        current_question,
-        all_memories,
-        client,
-        MODEL_NAME
-    )
-    if relevant_memories:
-        memory_block = "\n".join([f"- {fact}" for fact in relevant_memories])
-        prompt += f"""
+    # Retrieved when the router flags an explicit memory question, or
+    # when the user is asking about a previous conversation (memory
+    # often helps answer those too).
+    if route.needs_memory or route.needs_previous_conversation:
+        all_memories = load_memories()
+        relevant_memories = retrieve_relevant_memories(
+            current_question,
+            all_memories
+        )
+        if relevant_memories:
+            print(f"[CONTEXT] Memory added ({len(relevant_memories)} facts)")
+            memory_block = "\n".join([f"- {fact}" for fact in relevant_memories])
+            prompt += f"""
 
 You have the following relevant background information about this student
 from previous conversations. Use it naturally when helpful, without
 explicitly mentioning that you "remembered" it unless it fits naturally:
 {memory_block}"""
+        else:
+            print("[CONTEXT] Memory requested but no relevant facts found")
 
-    # ---- Previous conversation summary (only if relevant) ----
-    if question_needs_previous_conversation(current_question):
+    # ---- Previous conversation summary (only if router flags it) ----
+    if route.needs_previous_conversation:
         result = get_previous_conversation_summary(conversations, active_id)
         if result:
+            print("[CONTEXT] Previous conversation summary added")
             prev_summary, prev_title = result
             prompt += f"""
 
@@ -171,6 +237,7 @@ the most recent earlier conversation (titled "{prev_title}"):
 Use this to answer naturally. Do NOT say you are stateless or that you
 don't remember previous conversations — you have this summary available."""
         else:
+            print("[CONTEXT] Previous conversation requested but none found")
             prompt += """
 
 The student is asking about a previous conversation, but no earlier
@@ -178,35 +245,6 @@ conversation with a summary exists. Honestly tell them there is no
 previous conversation on record."""
 
     return prompt
-
-
-
-def question_is_about_assignments(question):
-    keywords = [
-        "assignment",
-        "assignments",
-        "homework",
-        "devoir",
-        "devoirs",
-        "task",
-        "tasks",
-        "pending",
-        "deadline",
-        "deadlines",
-        "due",
-        "overdue",
-        "devoir",
-        "devoirs",
-        "travail",
-        "travaux",
-        "tâche",
-        "tâches",
-        "date limite"
-    ]
-
-    question = question.lower()
-
-    return any(keyword in question for keyword in keywords)
 
 # ---------------------------------------------------------
 # STEP 4: Load conversations from disk ONCE per session
@@ -319,8 +357,9 @@ with st.sidebar:
         current_conversation = st.session_state.conversations[
             st.session_state.active_conversation_id
         ]
-        current_conversation["summary"] = generate_conversation_summary(
-            current_conversation
+        close_conversation_and_process_memory(
+            current_conversation,
+            st.session_state.active_conversation_id
         )
 
         new_id = create_new_conversation(
@@ -393,8 +432,9 @@ with st.sidebar:
                         current_conversation = st.session_state.conversations[
                             st.session_state.active_conversation_id
                         ]
-                        current_conversation["summary"] = generate_conversation_summary(
-                            current_conversation
+                        close_conversation_and_process_memory(
+                            current_conversation,
+                            st.session_state.active_conversation_id
                         )
                         save_conversations(st.session_state.conversations)
 
@@ -557,20 +597,31 @@ if user_question:
     with st.chat_message("user"):
         st.markdown(user_question)
 
-    # Build system prompt with student memory + previous-conversation summary if relevant
-    dynamic_system_prompt = build_system_prompt_with_context(
-    user_question,
-    st.session_state.conversations,
-    active_id
-)
+    # ---------------------------------------------------------
+    # PYTHON ROUTER: decide what context is needed (no LLM call)
+    # ---------------------------------------------------------
+    route = route_message(user_question)
+    print(f"[ROUTER] {route.label()}")
 
-    if question_is_about_assignments(user_question):
+    # Build system prompt with only the context the router requested
+    dynamic_system_prompt = build_system_prompt_with_context(
+        route,
+        user_question,
+        st.session_state.conversations,
+        active_id
+    )
+
+    if route.needs_classroom:
+        print("[CONTEXT] Fetching Classroom assignments")
         pending_tasks_context, pending_error = get_pending_tasks_context()
 
         if pending_error:
             pending_tasks_context = (
                 f"Unable to retrieve pending tasks: {pending_error}"
             )
+            print(f"[CONTEXT] Classroom fetch failed: {pending_error}")
+        else:
+            print("[CONTEXT] Classroom data added")
 
         # Add pending tasks information to the LLM context
         dynamic_system_prompt += f"""
@@ -586,9 +637,16 @@ if user_question:
     permanent student memory.
     """
 
+    if route.is_normal:
+        print("[CONTEXT] No additional context required")
+
     messages_for_llm = [{"role": "system", "content": dynamic_system_prompt}] + \
     active_conversation["messages"][1:]
 
+    # ---------------------------------------------------------
+    # ONE main Groq call to generate the answer
+    # ---------------------------------------------------------
+    print("[LLM] Generating response")
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             response = client.chat.completions.create(
@@ -602,6 +660,10 @@ if user_question:
 
     save_conversations(st.session_state.conversations)
 
-    # Extract and store durable student facts (unchanged system)
-    new_facts = extract_memory_from_exchange(user_question, bot_reply , client , MODEL_NAME)
-    store_new_memories(new_facts, active_id , client, MODEL_NAME)
+    # ---------------------------------------------------------
+    # NOTE: memory extraction no longer runs after every message.
+    # It runs once, on conversation close/switch, via
+    # close_conversation_and_process_memory() (New Chat button and
+    # sidebar conversation switch). This avoids an extra Groq call
+    # per user message.
+    # ---------------------------------------------------------

@@ -19,153 +19,86 @@ def save_memories(memories):
     with open(MEMORY_FILE, "w", encoding="utf-8") as f: 
         json.dump(memories, f, indent=2, ensure_ascii=False) 
  
-def extract_memory_from_exchange(user_message, assistant_message , client , model_name): 
+# Small English/French stopwords list used to strip noise words before
+# comparing text. Deliberately short and simple — this is keyword
+# overlap, not NLP.
+_STOPWORDS = {
+    "the", "a", "an", "is", "are", "was", "were", "am", "i", "me", "my",
+    "what", "which", "who", "do", "does", "did", "you", "your", "to",
+    "of", "in", "on", "for", "and", "or", "about", "that", "this",
+    "le", "la", "les", "un", "une", "de", "des", "je", "tu", "il",
+    "que", "qui", "quoi", "sur", "pour", "et", "ou",
+}
+
+
+def _keywords(text):
+    words = "".join(c if c.isalnum() else " " for c in text.lower()).split()
+    return {w for w in words if w not in _STOPWORDS and len(w) > 2}
+
+
+def _similarity(text_a, text_b):
+    """
+    Jaccard-style overlap between the meaningful keywords of two
+    strings. Returns a float in [0, 1]. Pure Python, no LLM.
+    """
+    keywords_a = _keywords(text_a)
+    keywords_b = _keywords(text_b)
+    if not keywords_a or not keywords_b:
+        return 0.0
+    intersection = keywords_a & keywords_b
+    union = keywords_a | keywords_b
+    return len(intersection) / len(union)
+
+
+# Thresholds for deterministic fact deduplication/update. These are
+# heuristics, not semantic understanding — tuned to catch obvious
+# rewordings ("learning Java" vs "currently learning Java") without
+# an LLM call.
+DUPLICATE_SIMILARITY_THRESHOLD = 0.6
+UPDATE_SIMILARITY_THRESHOLD = 0.3
+
+
+def _classify_fact(new_fact, existing_memories):
+    """
+    Deterministically decide whether a new fact should be added,
+    should update an existing memory, or should be skipped as a
+    duplicate — using keyword-overlap similarity only. No LLM call.
+
+    Returns a tuple: ("add", None) | ("update", index) | ("skip", None)
+    """
+    if not existing_memories:
+        return ("add", None)
+
+    best_index = None
+    best_score = 0.0
+
+    for i, memory in enumerate(existing_memories):
+        score = _similarity(new_fact, memory["text"])
+        if score > best_score:
+            best_score = score
+            best_index = i
+
+    if best_score >= DUPLICATE_SIMILARITY_THRESHOLD:
+        return ("skip", None)
+    elif best_score >= UPDATE_SIMILARITY_THRESHOLD:
+        return ("update", best_index)
+    else:
+        return ("add", None)
+
+
+def store_new_memories(new_facts, conversation_id): 
+    """
+    Add new facts to memories.json, handling duplicates/updates using
+    deterministic Python keyword-overlap matching. No LLM call.
     """ 
-    Ask the LLM whether this exchange contains durable info worth 
-    remembering. Returns a list of fact strings (possibly empty). 
-    """ 
-    extraction_prompt = f"""Analyze this exchange between a student and an assistant. 
- 
-Extract ONLY durable, reusable facts about the STUDENT that would help 
-in future, unrelated conversations. Examples of what to extract: 
-- current university modules 
-- current projects 
-- technologies/programming languages being learned 
-- preferred explanation style 
-- learning goals 
-- study habits 
-- recurring interests 
-- future objectives 
-- important preferences 
- 
-Do NOT extract: 
-- one-time questions with no future relevance (e.g. "What is a Python loop?") 
-- greetings, jokes, small talk 
-- temporary/throwaway requests 
- 
-If nothing is worth remembering, return an empty JSON array: [] 
- 
-Respond ONLY with a JSON array of short fact strings. Example: 
-["Studying 2nd-year engineering", "Currently learning React for a school project"] 
- 
-User message: {user_message} 
-Assistant message: {assistant_message} 
-""" 
- 
-    response = client.chat.completions.create( 
-        model=model_name, 
-        messages=[{"role": "user", "content": extraction_prompt}] 
-    ) 
- 
-    raw_reply = response.choices[0].message.content.strip() 
- 
-    if raw_reply.startswith("```"): 
-        raw_reply = raw_reply.strip("`") 
-        if raw_reply.startswith("json"): 
-            raw_reply = raw_reply[4:] 
-        raw_reply = raw_reply.strip() 
- 
-    try: 
-        facts = json.loads(raw_reply) 
-        if not isinstance(facts, list): 
-            return [] 
-        return [f.strip() for f in facts if isinstance(f, str) and f.strip()] 
-    except json.JSONDecodeError: 
-        return [] 
- 
-def classify_facts_batch(new_facts, existing_memories, client, model_name): 
-    """ 
-    Ask the LLM, in a single call, whether each fact in new_facts 
-    duplicates/updates an existing memory. Returns a list of 
-    (action, index) tuples, one per fact in new_facts, in the same 
-    order. action is "skip", "update", or "add" - identical semantics 
-    to the previous per-fact is_duplicate_or_similar(). 
-    """ 
-    if not new_facts: 
-        return [] 
- 
-    if not existing_memories: 
-        return [("add", None) for _ in new_facts] 
- 
-    memory_list_text = "\n".join( 
-        [f"{i}: {m['text']}" for i, m in enumerate(existing_memories)] 
-    ) 
- 
-    facts_list_text = "\n".join( 
-        [f"{i}: {fact}" for i, fact in enumerate(new_facts)] 
-    ) 
- 
-    check_prompt = f"""Here is a list of existing memories about a student: 
-{memory_list_text} 
- 
-Here is a list of NEW facts to consider, each identified by an index: 
-{facts_list_text} 
- 
-For EACH new fact, decide one of: 
-- "skip" if this fact is already covered by an existing memory (true duplicate) 
-- "update:<index>" if this fact updates/replaces an existing memory (e.g. new module replaces old one) 
-- "add" if this is genuinely new information 
- 
-Respond ONLY with a JSON array with exactly one decision per new fact, 
-in the same order as the new facts list above. Each element must be a 
-string: "skip", "update:<index>", or "add". Example for 3 new facts: 
-["add", "skip", "update:2"] 
-""" 
- 
-    response = client.chat.completions.create( 
-        model=model_name, 
-        messages=[{"role": "user", "content": check_prompt}] 
-    ) 
- 
-    raw_reply = response.choices[0].message.content.strip() 
- 
-    if raw_reply.startswith("```"): 
-        raw_reply = raw_reply.strip("`") 
-        if raw_reply.startswith("json"): 
-            raw_reply = raw_reply[4:] 
-        raw_reply = raw_reply.strip() 
- 
-    try: 
-        decisions_raw = json.loads(raw_reply) 
-        if not isinstance(decisions_raw, list): 
-            return [("add", None) for _ in new_facts] 
-    except json.JSONDecodeError: 
-        return [("add", None) for _ in new_facts] 
- 
-    results = [] 
-    for i in range(len(new_facts)): 
-        if i >= len(decisions_raw) or not isinstance(decisions_raw[i], str): 
-            results.append(("add", None)) 
-            continue 
- 
-        decision = decisions_raw[i].strip().lower() 
- 
-        if decision.startswith("skip"): 
-            results.append(("skip", None)) 
-        elif decision.startswith("update"): 
-            try: 
-                index = int(decision.split(":")[1].strip()) 
-                if 0 <= index < len(existing_memories): 
-                    results.append(("update", index)) 
-                else: 
-                    results.append(("add", None)) 
-            except (IndexError, ValueError): 
-                results.append(("add", None)) 
-        else: 
-            results.append(("add", None)) 
- 
-    return results 
- 
-def store_new_memories(new_facts, conversation_id, client , model_name): 
-    """Add new facts to memories.json, handling duplicates/updates.""" 
     if not new_facts: 
         return 
  
     memories = load_memories() 
  
-    decisions = classify_facts_batch(new_facts, memories, client, model_name) 
- 
-    for fact, (action, index) in zip(new_facts, decisions): 
+    for fact in new_facts:
+        action, index = _classify_fact(fact, memories)
+
         if action == "skip": 
             continue 
         elif action == "update": 
@@ -180,52 +113,39 @@ def store_new_memories(new_facts, conversation_id, client , model_name):
  
     save_memories(memories) 
  
-def retrieve_relevant_memories(current_question, all_memories,client,model_name , max_memories=5): 
-    """ 
-    Ask the LLM which stored memories are relevant to the current question. 
-    Returns a list of relevant memory text strings. 
-    """ 
-    if not all_memories: 
-        return [] 
- 
-    memory_list_text = "\n".join( 
-        [f"{i}: {m['text']}" for i, m in enumerate(all_memories)] 
-    ) 
- 
-    retrieval_prompt = f"""Here is a list of stored memories about a student: 
-{memory_list_text} 
- 
-Current question from the student: "{current_question}" 
- 
-Which memories (if any) are relevant to understanding or answering this 
-question? Relevant means it would help personalize or inform the response. 
- 
-Respond ONLY with a JSON array of the relevant indices (numbers). 
-Example: [0, 2] 
-If none are relevant, respond with: [] 
-""" 
- 
-    response = client.chat.completions.create( 
-        model=model_name, 
-        messages=[{"role": "user", "content": retrieval_prompt}] 
-    ) 
- 
-    raw_reply = response.choices[0].message.content.strip() 
- 
-    if raw_reply.startswith("```"): 
-        raw_reply = raw_reply.strip("`") 
-        if raw_reply.startswith("json"): 
-            raw_reply = raw_reply[4:] 
-        raw_reply = raw_reply.strip() 
- 
-    try: 
-        indices = json.loads(raw_reply) 
-        if not isinstance(indices, list): 
-            return [] 
-        relevant = [] 
-        for i in indices[:max_memories]: 
-            if isinstance(i, int) and 0 <= i < len(all_memories): 
-                relevant.append(all_memories[i]["text"]) 
-        return relevant 
-    except json.JSONDecodeError: 
-        return [] 
+def retrieve_relevant_memories(current_question, all_memories, max_memories=5, fallback_count=3):
+    """
+    Select memories relevant to the current question using lightweight
+    keyword overlap. No LLM call — pure Python string matching.
+
+    A memory is considered relevant if it shares at least one
+    meaningful keyword with the question. Results are ranked by number
+    of overlapping keywords (most overlap first).
+
+    Fallback: generic questions like "what do you know about me?" or
+    "qu'est-ce que tu sais sur moi ?" strip down to almost no
+    meaningful keywords after stopword removal, so they never overlap
+    with specific stored facts. When keyword matching finds nothing,
+    fall back to the most recently stored facts instead of returning
+    an empty list — still 0 LLM calls, just a deterministic fallback.
+    """
+    if not all_memories:
+        return []
+
+    question_keywords = _keywords(current_question)
+
+    scored = []
+    if question_keywords:
+        for memory in all_memories:
+            memory_keywords = _keywords(memory["text"])
+            overlap = question_keywords & memory_keywords
+            if overlap:
+                scored.append((len(overlap), memory["text"]))
+        scored.sort(key=lambda pair: pair[0], reverse=True)
+
+    if scored:
+        return [text for _, text in scored[:max_memories]]
+
+    # No keyword overlap (or no meaningful keywords at all) — fall
+    # back to the most recently stored facts.
+    return [m["text"] for m in all_memories[-fallback_count:]]
