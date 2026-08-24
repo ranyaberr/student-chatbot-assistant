@@ -1,217 +1,32 @@
 [
   {
-    "id": "3cfcf2d0-8d84-46fd-b762-a070fbae8304",
-    "text": "Student is studying data science and AI, with courses in Operational Research and Stochastic Modelling.",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
+    "id": "31cd7e9d-c918-4c17-a76c-50ee4697ed54",
+    "text": "studying web development",
+    "conversation_id": "f0622a0d-bc7d-4fb1-a9e4-ada7171c2e63"
   },
   {
-    "id": "6bc0220f-5c0c-416b-b12a-90b354b279f7",
-    "text": "Familiar with C++ and Java OOP concepts such as polymorphism and arrays",
-    "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
+    "id": "41f50d86-e78c-4cad-8746-ed1d5872d6ca",
+    "text": "focus on HTML and CSS",
+    "conversation_id": "f0622a0d-bc7d-4fb1-a9e4-ada7171c2e63"
   },
   {
-    "id": "453c8cd1-c7e5-4025-aeba-58af6826dd81",
-    "text": "Interested in big data",
-    "conversation_id": "4cca9b2a-d568-42ac-8969-66bf215a8b5e"
+    "id": "f9959bba-5e73-4306-80ea-9c43fc832d7b",
+    "text": "The student communicates with the professor in French and prefers explanations in French.",
+    "conversation_id": "01d7f175-647b-4609-b950-aec2f40d983c"
   },
   {
-    "id": "40b316af-3592-473b-b534-6d5ccc5140e9",
-    "text": "Wants to learn machine learning",
-    "conversation_id": "bf915019-ea1e-41dc-a7d2-3214e9b6c140"
+    "id": "5cf63d96-b7e0-4d8f-93fe-60bc86cf9589",
+    "text": "Ranya is a student enrolled in an AI and Big Data Science program.",
+    "conversation_id": "5da20c99-0d88-46b0-9b3b-c677eb259b7d"
   },
   {
-    "id": "acec1012-b900-4fc8-a577-35b483f075ff",
-    "text": "Likely to use Python for machine learning",
-    "conversation_id": "bf915019-ea1e-41dc-a7d2-3214e9b6c140"
+    "id": "2d05f33f-6762-49ed-b721-411afa582232",
+    "text": "The student is a university student working on an assignment that needs to be submitted online.",
+    "conversation_id": "01d7f175-647b-4609-b950-aec2f40d983c"
   },
   {
-    "id": "fc4b2fc5-d068-4a24-8eac-78b6ef96e984",
-    "text": "Looking for beginner machine‑learning project ideas",
-    "conversation_id": "2375cae4-d446-4e91-91d4-2e2a93c1fdae"
-  },
-  {
-    "id": "ddac901f-2e28-4414-aea9-d30a6aaca915",
-    "text": "Studying object-oriented programming",
-    "conversation_id": "a6da4b61-f666-42a4-bf89-818022ce3227"
-  },
-  {
-    "id": "15d656b9-9158-4fa8-b192-d36669c66612",
-    "text": "Currently learning about polymorphism",
-    "conversation_id": "a6da4b61-f666-42a4-bf89-818022ce3227"
-  },
-  {
-    "id": "59e3f71a-8ccb-4833-8ecc-24d489b8e80d",
-    "text": "Planning to explore machine learning concepts in Python",
-    "conversation_id": "5606954b-5a38-4a13-a327-94023d0ed731"
-  },
-  {
-    "id": "281044dd-7ac2-41f8-ad73-0fea2ab5a85f",
-    "text": "Learning Java",
-    "conversation_id": "f2cf21de-f8d5-4b13-82f6-0911074f3820"
-  },
-  {
-    "id": "582f30b8-87f6-4a8a-ab27-c021a973ff6d",
-    "text": "Currently studying courses: TP, JAVA, Technologies WEB, SI et BD, Compilation, Recherche opérationnelle: Modélisation stochastique, Dev WEB - SDBDIA S6, Architectures des ordinateurs, Comptabilité Générale (Cours et TD), Recherche Opérationnelle",
-    "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
-  },
-  {
-    "id": "1bff97e2-bf34-430e-a6ea-c20ca3ebde9d",
-    "text": "Uses Google Classroom",
-    "conversation_id": "6b9c9773-a20c-4e51-abaf-b56ebbd9bb94"
-  },
-  {
-    "id": "3472783c-4ef8-4f3b-903f-1cf55db3e047",
-    "text": "Has multiple Google Classroom assignments across Java, Web, SI, and Architecture modules",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "c863a4b7-8e33-4618-b8c8-bb0e42d50120",
-    "text": "Prioritizes overdue assignments first",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "42688151-0bf4-4214-aa36-f673e870db43",
-    "text": "Seeking to study Java in a structured roadmap from fundamentals to advanced topics",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "d6bed9d7-be21-4bbf-afdd-04f97c6c0a79",
-    "text": "Interested in Java concepts such as OOP, collections, generics, streams, concurrency, design patterns, and JVM internals",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "2efaed74-0925-4d3c-9537-b955e8f2ba96",
-    "text": "Looking to set up a study schedule",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "4a713cbd-67e3-418d-a045-089fed3aeebe",
-    "text": "Learning Python (and Java) for coding projects",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "6524e738-1459-45a2-9fef-d955f748d07d",
-    "text": "Uses flashcards (Anki) and spaced repetition to memorize formulas",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "0f79d676-55cb-4ffd-be07-ff57c7c10779",
-    "text": "Student prefers concise, bullet‑pointed explanations and actionable study tips such as micro‑sessions, Pomodoro, flashcards, and concept maps.",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "b7dee2d5-651f-4dcf-a4ab-3734380a53fc",
-    "text": "Maintains a math journal to track progress",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "d90689dd-1684-4bf4-9ce5-7fe83702cad9",
-    "text": "Links mathematical concepts to data‑science projects",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "3faf1665-e3a9-4ac2-b553-4ecceeac776b",
-    "text": "Student is taking Java programming courses, including assignments and an exam scheduled tomorrow.",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "b08df2b3-6190-4f09-a85a-d803d60c0bb8",
-    "text": "Student uses tools like Anki, Miro, or a whiteboard for learning.",
-    "conversation_id": "3d800d76-9886-41ee-ac61-ee5b023cb148"
-  },
-  {
-    "id": "7067350b-1396-4bb1-a57b-381dec3fd913",
-    "text": "The student is a university student enrolled in modules such as Technologies WEB, Architecture des ordinateurs, and SIBD/BD.",
-    "conversation_id": "dcb0970e-c2d3-40af-bb41-2a5af0db564f"
-  },
-  {
-    "id": "88f30098-cebb-4d0c-8b03-4bf0a8d74a01",
-    "text": "The student is a beginner in HTML and CSS and is actively seeking targeted practice to improve these skills.",
-    "conversation_id": "dcb0970e-c2d3-40af-bb41-2a5af0db564f"
-  },
-  {
-    "id": "976460d9-ce44-4a5b-9720-cfe388549a0b",
-    "text": "The student plans to create a website for a company, starting with a project skeleton and basic semantic structure.",
-    "conversation_id": "dcb0970e-c2d3-40af-bb41-2a5af0db564f"
-  },
-  {
-    "id": "679d6a94-7fcd-49c5-9370-2d4e16f4cf78",
-    "text": "The student wants to understand and correctly use HTML semantic tags like <main> and <footer> and needs clear explanations in French.",
-    "conversation_id": "dcb0970e-c2d3-40af-bb41-2a5af0db564f"
-  },
-  {
-    "id": "acaa7b26-e6b1-4d7e-80de-7c055a8926a3",
-    "text": "The student prefers step‑by‑step guidance and concrete exercises to solidify concepts.",
-    "conversation_id": "dcb0970e-c2d3-40af-bb41-2a5af0db564f"
-  },
-  {
-    "id": "a5dcc0a7-4d87-4f40-87b8-4eb0b70559bb",
-    "text": "Project is a mini‑site web “À propos / Contact”",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "6c62ad15-a5f3-4b75-94e7-fbd2d136086b",
-    "text": "Technologies being learned: HTML, CSS, JavaScript",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "201d63f6-4279-40f8-86f7-659ea04f9411",
-    "text": "Learning goal: build a small static website with basic interactivity",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "7d3cee41-a3f0-4e30-aa5a-2814926ec408",
-    "text": "Prefers detailed, step‑by‑step explanations with examples and exercises",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "8778c2b9-8c19-41bf-9eed-fbbd8e25cdc9",
-    "text": "Requests weekly exercise plan to structure learning",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "8dd43732-7dc4-4727-adae-c0846516b660",
-    "text": "Interested in responsive design, semantic HTML, and basic form validation",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "982414f4-b0d0-4350-a42e-7ad805d73c41",
-    "text": "Deployment target: GitHub Pages",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "3a11dceb-15a3-4d1d-8268-096a08058e1c",
-    "text": "Uses Git for version control and prefers concise commit messages",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "b1d07f4f-e7b7-403b-9516-c511ad36824c",
-    "text": "Aims to use only one framework at the start (e.g., Bootstrap, Bulma, or Tailwind)",
-    "conversation_id": "5a95f54f-49ca-441a-9d60-248b3113133d"
-  },
-  {
-    "id": "cc5061bd-f530-4e51-8c8d-c39dd736d2cc",
-    "text": "Ranya Berroukech is a student studying Big Data, AI, and Data Science.",
-    "conversation_id": "b85afbf2-1fc2-404e-a52c-be1fe5e8c121"
-  },
-  {
-    "id": "6df05f5c-08a9-4f4f-84c3-354ed5aae255",
-    "text": "Interested in linear algebra and analysis",
-    "conversation_id": "2375cae4-d446-4e91-91d4-2e2a93c1fdae"
-  },
-  {
-    "id": "acd8d05b-1c80-4500-bbc2-cb043f27f5ef",
-    "text": "Looking for preparation advice for the next academic year",
-    "conversation_id": "2375cae4-d446-4e91-91d4-2e2a93c1fdae"
-  },
-  {
-    "id": "e2af9d84-090f-4dbe-a5b4-da95d49ff00f",
-    "text": "Wants to understand if advanced math is necessary for ML/Deep Learning",
-    "conversation_id": "2375cae4-d446-4e91-91d4-2e2a93c1fdae"
-  },
-  {
-    "id": "622821e5-7e27-4b0d-aaff-ff5616aa9176",
-    "text": "Working on a mini-website (simple skeleton with About/Contact page)",
-    "conversation_id": "f2cf21de-f8d5-4b13-82f6-0911074f3820"
+    "id": "bc42da1e-06a8-4856-a26c-3f7f4d08fa88",
+    "text": "The student is experiencing internet connectivity problems preventing submission of the assignment.",
+    "conversation_id": "01d7f175-647b-4609-b950-aec2f40d983c"
   }
 ]

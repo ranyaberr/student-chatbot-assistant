@@ -55,6 +55,10 @@ PREVIOUS_CONVERSATION_KEYWORDS = [
     "on a discuté", "on a discute",
     "on avait dit",
     "précédemment", "precedemment",
+    "de quoi on a parle ",
+    "De quoi on avait parle dans notre dernière conversation",
+    "De quoi on a parlé dans la dernière conversation ",
+    "on avait parlé de",
     # English (secondary)
     "last time",
     "previous conversation",
@@ -67,6 +71,7 @@ PREVIOUS_CONVERSATION_KEYWORDS = [
     "earlier conversation",
     "last conversation",
     "previously",
+    "what did we talk about"
 ]
 
 # ---- MEMORY ----
@@ -75,6 +80,12 @@ MEMORY_KEYWORDS = [
     # French (primary) — explicit remember/recall requests
     "souviens-toi",
     "rappelle-toi",
+    "comment je m appelle",
+    "comment je m'appelle",
+    "quel est mon nom",
+    "c'est quoi mon nom",
+    "c est quoi mon nom", 
+    "tu connais mon nom",   
     "tu te souviens",
     "tu te rappelles",
     "n'oublie pas",
@@ -141,14 +152,51 @@ class RouteResult:
         return " + ".join(flags) if flags else "NORMAL"
 
 
+# ---------------------------------------------------------
+# NORMALIZATION
+# ---------------------------------------------------------
+# Users type apostrophes and hyphens inconsistently depending on their
+# keyboard/browser/OS ("qu'est-ce que" vs "qu est-ce que" vs
+# "qu est ce que"). To avoid having to hardcode every spelling variant
+# in the keyword lists, we normalize BOTH the keyword strings and the
+# incoming user message the same way before matching:
+#   1. Replace every apostrophe variant (straight + curly) with a space.
+#   2. Replace every hyphen/dash variant (ASCII + typographic) with a space.
+#   3. Collapse repeated whitespace into a single space and strip ends.
+#
+# This is purely textual normalization — no LLM, no new dependencies.
+
+_APOSTROPHE_CHARS = "'’‘‛`´"
+_HYPHEN_CHARS = "-‐‑‒–—―"
+
+_APOSTROPHE_PATTERN = re.compile("[" + re.escape(_APOSTROPHE_CHARS) + "]")
+_HYPHEN_PATTERN = re.compile("[" + re.escape(_HYPHEN_CHARS) + "]")
+_WHITESPACE_PATTERN = re.compile(r"\s+")
+
+
+def _normalize(text):
+    """
+    Normalize apostrophes and hyphens (of any common variant) to
+    spaces, then collapse whitespace. Used on both keyword strings and
+    the incoming user message so that matching is insensitive to
+    punctuation style.
+    """
+    text = _APOSTROPHE_PATTERN.sub(" ", text)
+    text = _HYPHEN_PATTERN.sub(" ", text)
+    text = _WHITESPACE_PATTERN.sub(" ", text)
+    return text.strip()
+
+
 def _compile_patterns(keywords):
     """
     Compile each keyword/phrase into a word-boundary regex so that,
-    e.g., "travail" does not match inside "travaille". Still pure
+    e.g., "travail" does not match inside "travaille". The keyword is
+    normalized first (apostrophes/hyphens -> spaces) so the compiled
+    pattern matches against normalized message text. Still pure
     Python/regex — no LLM involved.
     """
     return [
-        re.compile(r"\b" + re.escape(keyword) + r"\b", re.UNICODE)
+        re.compile(r"\b" + re.escape(_normalize(keyword)) + r"\b", re.UNICODE)
         for keyword in keywords
     ]
 
@@ -170,7 +218,7 @@ def route_message(user_message):
     message can require classroom data AND memory AND previous-chat
     context at the same time.
     """
-    text = user_message.lower()
+    text = _normalize(user_message.lower())
 
     needs_classroom = _contains_any(text, _CLASSROOM_PATTERNS)
     needs_previous_conversation = _contains_any(text, _PREVIOUS_CONVERSATION_PATTERNS)
