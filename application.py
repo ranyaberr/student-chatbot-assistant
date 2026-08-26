@@ -288,17 +288,171 @@ with st.sidebar:
         font-size: 14px !important;
     }
 
-    .pending-dot {
+    .pending-badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
-        width: 10px;
-        height: 10px;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        min-width: 22px;
+        padding: 2px 8px;
         background-color: #ff4b4b;
-        border-radius: 50%;
-       
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        border-radius: 999px;
         z-index: 5;
         pointer-events: none;
+        line-height: 1.4;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ---------------------------------------------------------
+    # General visual polish (cosmetic only — no widget logic,
+    # labels, keys, callbacks, or state touched)
+    # ---------------------------------------------------------
+    st.markdown("""
+    <style>
+    /* Main content area: comfortable padding + calmer typography */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        max-width: 900px;
+    }
+
+    /* Chat page title + subtitle spacing */
+    .main h1 {
+        margin-bottom: 0.2rem;
+        font-weight: 700;
+    }
+    .main [data-testid="stMarkdownContainer"] p {
+        color: rgba(120,120,120,0.95);
+    }
+
+    /* Sidebar: slightly softer background + a touch more breathing room */
+    section[data-testid="stSidebar"] {
+        background-color: rgba(128,128,128,0.03);
+    }
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 1.2rem;
+    }
+
+    /* Sidebar title separated from nav items below */
+    section[data-testid="stSidebar"] h1 {
+        padding-bottom: 0.6rem;
+        margin-bottom: 0.8rem;
+        border-bottom: 1px solid rgba(128,128,128,0.18);
+        font-size: 1.3rem;
+    }
+
+    /* "Recent Conversations" section label styling */
+    section[data-testid="stSidebar"] h3 {
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(128,128,128,0.85);
+        margin-top: 1.2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    /* Sidebar buttons (New Chat, Recent Conversations, popover Rename/
+       Delete/Save/Cancel, Connect to Google Classroom) — rounded
+       corners + calm hover, no color/behavior change */
+    section[data-testid="stSidebar"] button {
+        border-radius: 8px !important;
+        transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    section[data-testid="stSidebar"] button:hover {
+        background-color: rgba(128,128,128,0.10) !important;
+    }
+
+    /* Pending Tasks bar: soft hover affordance */
+    .st-key-pending_tasks_bar_container button:hover {
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    /* Recent Conversations: title buttons get a touch more left padding
+       so the list reads cleanly */
+    section[data-testid="stSidebar"] [data-testid="column"]:first-of-type button {
+        text-align: left !important;
+        padding-left: 10px !important;
+    }
+
+    /* The "⋮" popover trigger — small, muted icon-style button */
+    section[data-testid="stSidebar"] [data-testid="stPopover"] button {
+        border-radius: 999px !important;
+        padding: 2px 8px !important;
+        color: rgba(128,128,128,0.9) !important;
+    }
+
+    /* Chat message bubbles */
+    div[data-testid="stChatMessage"] {
+        border-radius: 12px;
+        padding: 10px 14px;
+        margin-bottom: 10px;
+        background-color: rgba(128,128,128,0.05);
+        border: 1px solid rgba(128,128,128,0.08);
+    }
+
+    /* Chat input box */
+    div[data-testid="stChatInput"] {
+        border-radius: 10px;
+    }
+    div[data-testid="stChatInput"] textarea {
+        border-radius: 10px !important;
+    }
+
+    /* Success message (Google Classroom connected) */
+    div[data-testid="stAlert"] {
+        border-radius: 8px;
+    }
+
+    /* Recent Conversations: each row (title button + ⋮ menu) */
+    section[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] {
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 2px;
+    }
+
+    /* Recent Conversations: title button — full-width row, left-aligned,
+       truncates long titles with an ellipsis */
+    section[data-testid="stSidebar"] [class*="st-key-conv_"] button {
+        width: 100% !important;
+        display: block !important;
+        text-align: left !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        background-color: transparent !important;
+        border: none !important;
+        padding: 9px 10px !important;
+        min-height: 38px !important;
+        border-radius: 8px !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        box-shadow: none !important;
+    }
+    section[data-testid="stSidebar"] [class*="st-key-conv_"] button:hover {
+        background-color: rgba(128,128,128,0.12) !important;
+    }
+
+    /* Recent Conversations: "⋮" menu trigger — small and subtle */
+    section[data-testid="stSidebar"] [data-testid="stPopover"] button {
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 2px 6px !important;
+        min-height: 28px !important;
+        color: rgba(128,128,128,0.7) !important;
+        font-size: 14px !important;
+        box-shadow: none !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stPopover"] button:hover {
+        background-color: rgba(128,128,128,0.12) !important;
+        color: rgba(128,128,128,1) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -323,16 +477,16 @@ with st.sidebar:
     # The container itself comes BEFORE New Chat
     with st.container(key="pending_tasks_bar_container"):
 
-        # Red notification dot
+        # Pending count badge (only shown when there are pending tasks)
         if pending_count > 0:
             st.markdown(
-                '<div class="pending-dot"></div>',
+                f'<div class="pending-badge">{pending_count}</div>',
                 unsafe_allow_html=True
             )
 
         # REAL clickable button
         if st.button(
-           f"📋 Pending Tasks        {pending_count}",
+           "📋 Pending Tasks",
             key=   "open_pending_tasks_btn",
             use_container_width=True
 ):
@@ -583,48 +737,49 @@ else:
         with st.chat_message(message["role"]):
 
             st.markdown(message["content"])
-# ---------------------------------------------------------
-# STEP 7: Handle new user input
-# ---------------------------------------------------------
-user_question = st.chat_input("Type your question here...")
-
-if user_question:
-    active_conversation["messages"].append({"role": "user", "content": user_question})
-
-    if active_conversation["title"] == "New conversation":
-        active_conversation["title"] = make_title(user_question)
-
-    with st.chat_message("user"):
-        st.markdown(user_question)
 
     # ---------------------------------------------------------
-    # PYTHON ROUTER: decide what context is needed (no LLM call)
+    # STEP 7: Handle new user input
     # ---------------------------------------------------------
-    route = route_message(user_question)
-    print(f"[ROUTER] {route.label()}")
+    user_question = st.chat_input("Type your question here...")
 
-    # Build system prompt with only the context the router requested
-    dynamic_system_prompt = build_system_prompt_with_context(
-        route,
-        user_question,
-        st.session_state.conversations,
-        active_id
-    )
+    if user_question:
+        active_conversation["messages"].append({"role": "user", "content": user_question})
 
-    if route.needs_classroom:
-        print("[CONTEXT] Fetching Classroom assignments")
-        pending_tasks_context, pending_error = get_pending_tasks_context()
+        if active_conversation["title"] == "New conversation":
+            active_conversation["title"] = make_title(user_question)
 
-        if pending_error:
-            pending_tasks_context = (
-                f"Unable to retrieve pending tasks: {pending_error}"
-            )
-            print(f"[CONTEXT] Classroom fetch failed: {pending_error}")
-        else:
-            print("[CONTEXT] Classroom data added")
+        with st.chat_message("user"):
+            st.markdown(user_question)
 
-        # Add pending tasks information to the LLM context
-        dynamic_system_prompt += f"""
+        # ---------------------------------------------------------
+        # PYTHON ROUTER: decide what context is needed (no LLM call)
+        # ---------------------------------------------------------
+        route = route_message(user_question)
+        print(f"[ROUTER] {route.label()}")
+
+        # Build system prompt with only the context the router requested
+        dynamic_system_prompt = build_system_prompt_with_context(
+            route,
+            user_question,
+            st.session_state.conversations,
+            active_id
+        )
+
+        if route.needs_classroom:
+            print("[CONTEXT] Fetching Classroom assignments")
+            pending_tasks_context, pending_error = get_pending_tasks_context()
+
+            if pending_error:
+                pending_tasks_context = (
+                    f"Unable to retrieve pending tasks: {pending_error}"
+                )
+                print(f"[CONTEXT] Classroom fetch failed: {pending_error}")
+            else:
+                print("[CONTEXT] Classroom data added")
+
+            # Add pending tasks information to the LLM context
+            dynamic_system_prompt += f"""
 
     Here is live information from the student's Google Classroom:
 
@@ -637,33 +792,33 @@ if user_question:
     permanent student memory.
     """
 
-    if route.is_normal:
-        print("[CONTEXT] No additional context required")
+        if route.is_normal:
+            print("[CONTEXT] No additional context required")
 
-    messages_for_llm = [{"role": "system", "content": dynamic_system_prompt}] + \
-    active_conversation["messages"][1:]
+        messages_for_llm = [{"role": "system", "content": dynamic_system_prompt}] + \
+        active_conversation["messages"][1:]
 
-    # ---------------------------------------------------------
-    # ONE main Groq call to generate the answer
-    # ---------------------------------------------------------
-    print("[LLM] Generating response")
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=messages_for_llm
-            )
-            bot_reply = response.choices[0].message.content
-            st.markdown(bot_reply)
+        # ---------------------------------------------------------
+        # ONE main Groq call to generate the answer
+        # ---------------------------------------------------------
+        print("[LLM] Generating response")
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                response = client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=messages_for_llm
+                )
+                bot_reply = response.choices[0].message.content
+                st.markdown(bot_reply)
 
-    active_conversation["messages"].append({"role": "assistant", "content": bot_reply})
+        active_conversation["messages"].append({"role": "assistant", "content": bot_reply})
 
-    save_conversations(st.session_state.conversations)
+        save_conversations(st.session_state.conversations)
 
-    # ---------------------------------------------------------
-    # NOTE: memory extraction no longer runs after every message.
-    # It runs once, on conversation close/switch, via
-    # close_conversation_and_process_memory() (New Chat button and
-    # sidebar conversation switch). This avoids an extra Groq call
-    # per user message.
-    # ---------------------------------------------------------
+        # ---------------------------------------------------------
+        # NOTE: memory extraction no longer runs after every message.
+        # It runs once, on conversation close/switch, via
+        # close_conversation_and_process_memory() (New Chat button and
+        # sidebar conversation switch). This avoids an extra Groq call
+        # per user message.
+        # ---------------------------------------------------------
